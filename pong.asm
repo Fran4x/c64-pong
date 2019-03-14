@@ -1,4 +1,4 @@
-	#import "music_player.asm"
+
 
 		*=$2000 "Paddle"
 	.import binary "paddle.spr", 3 //import paddle sprite, skip first 3 bytes
@@ -7,6 +7,7 @@
 BasicUpstart2(start)
 
 	*=$080f "Main Code"
+	#import "music_player.asm"
 start:	jsr $e544 //clears screen, built in sub-routine at this location
 
 	// Sset colors of screen
