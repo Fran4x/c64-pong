@@ -1,10 +1,27 @@
-:BasicUpstart2(start)
+	#import "music_player.asm"
 
-	*=$080f
+		*=$2000 "Paddle"
+	.import binary "paddle.spr", 3 //import paddle sprite, skip first 3 bytes
+
+	
+BasicUpstart2(start)
+
+	*=$080f "Main Code"
 start:	jsr $e544 //clears screen, built in sub-routine at this location
+
+	// Sset colors of screen
+	lda #BLACK
+	sta $d021
+
+	lda #BLUE
+	sta $d020
+	//
+
+	jsr init_music
 	jsr set_sprt
 	jsr set_irq
 
+	
 loop:	jmp loop
 
 
@@ -54,6 +71,7 @@ set_irq:
 	rts
 
 irq:	dec $d019 // acknowledge IRQ
+	jsr play
 	jsr handle_input
 	jmp $ea81 // return to kernel IRQ routine
 
@@ -92,5 +110,4 @@ move_down:
 	inc $d001
 	rts
 	
-	*=$2000
-	.import binary "paddle.spr", 3 //import paddle sprite, skip first 3 bytes
+
