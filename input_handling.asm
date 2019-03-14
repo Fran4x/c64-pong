@@ -26,9 +26,21 @@ handle_input:
 	rts
 	
 move_up:
+	lda $d001
+	cmp #$33
+	bcs move_up_dec // if position >= $33, then branch
+	rts
+	
+move_up_dec:
 	dec $d001 //decrease sprite 1 y-coord
 	rts
 
 move_down:
+	lda #$cf
+	cmp $d001
+	bcs move_down_dec // if position <= $cf, branch
+	rts
+
+move_down_dec:
 	inc $d001 //decrease sprite 1 y-coord
 	rts
