@@ -66,8 +66,18 @@ detect_collisions:
 	ora r2
 	sta collisions
 	
+	jsr clear_vars
+	jsr detect_ball_lower_border
+	lda r1
+	and #%00001000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+	
 	
 	rts
+
 
 
 detect_ball_upper_border: //detects if the ball has collided with the upper border
@@ -78,6 +88,18 @@ detect_ball_upper_border: //detects if the ball has collided with the upper bord
 	bcs d_b_u_b_1 // if position <= $33, branch
 	rts
 d_b_u_b_1:
+	lda #$FF
+	sta r1
+	rts
+
+detect_ball_lower_border:	//detects if ball has collided with lower border
+	lda #00
+	sta r1
+	lda spr2_y
+	cmp #$f3
+	bcs d_b_l_b_1 // if $cf <= position, branch
+	rts
+d_b_l_b_1:
 	lda #$FF
 	sta r1
 	rts
