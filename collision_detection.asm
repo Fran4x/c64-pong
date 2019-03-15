@@ -74,10 +74,37 @@ detect_collisions:
 	lda collisions
 	ora r2
 	sta collisions
+
+	jsr clear_vars
+	jsr detect_ball_left_border
+	lda r1
+	and #%00010000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
 	
 	
 	rts
 
+
+
+detect_ball_left_border: //detects if the ball has collided with the left border of the screen
+	jsr load_ball_x
+	
+	lda #%00000100
+	and spr9th
+	beq d_b_le_b_1 //if 9th bit of ball is 0, branch
+	rts
+d_b_le_b_1:
+	lda #$18
+	cmp spr2_x
+	bcs d_b_le_b_2 // if position <= $18, branch
+	rts
+d_b_le_b_2:
+	lda #$FF
+	sta r1
+	rts
 
 
 detect_ball_upper_border: //detects if the ball has collided with the upper border
@@ -97,7 +124,7 @@ detect_ball_lower_border:	//detects if ball has collided with lower border
 	sta r1
 	lda spr2_y
 	cmp #$f3
-	bcs d_b_l_b_1 // if $cf <= position, branch
+	bcs d_b_l_b_1 // if $f3 <= position, branch
 	rts
 d_b_l_b_1:
 	lda #$FF
