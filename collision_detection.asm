@@ -57,8 +57,29 @@ detect_collisions:
 	ora r2
 	sta collisions //sets bit in collision if necessary
 
+	jsr clear_vars
+	jsr detect_ball_upper_border
+	lda r1
+	and #%00000100
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
 	
 	
+	rts
+
+
+detect_ball_upper_border: //detects if the ball has collided with the upper border
+	lda #00
+	sta r1
+	lda #$33
+	cmp spr2_y
+	bcs d_b_u_b_1 // if position <= $33, branch
+	rts
+d_b_u_b_1:
+	lda #$FF
+	sta r1
 	rts
 
 detect_ball_lpad:
