@@ -8,9 +8,13 @@
 	
 
 	.var paddle_height = 21*2 //paddle height is multiplied by 2
+	.var paddle_half_height = 21
 	.var paddle_width = 6
+	.var paddle_half_width = 3
 	.var ball_height = 7
+	.var ball_half_height = 3
 	.var ball_width = 10
+	.var ball_half_width = 5
 
 coll_func_vars: .fill 9, 0
 	.var x1 = coll_func_vars //position of segment 1
@@ -30,12 +34,25 @@ detect_collisions:
 
 detect_ball_rpad:	//checks whether a collision exists between the ball and right paddle, sets r1 to $FF if true
 	lda spr0_x
+	clc
+	adc #paddle_half_width // add half the width, to find center of object
 	sta x1
+	lda x91
+	adc #$00 //add the carry of the last operation to 9th bit in case it overflowed
+	sta x91
+	
 	lda spr2_x
+	clc
+	adc #ball_half_width
 	sta x2
+	lda x92
+	adc #$00
+	sta x92
+
 
 	lda spr9th
 	and #$01 //Isolate 9th bit
+  	adc x91
 	sta x91
 
 	lda spr9th
@@ -44,6 +61,7 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 	clc
 	ror
 	and #$01 //Isolate 9th bit of ball only
+  	adc x92
 	sta x92
 
 	lda #paddle_width
@@ -59,8 +77,12 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 	
 
 	lda spr0_y
+	clc
+	adc #paddle_half_height
 	sta x1
+	
 	lda spr2_y
+	adc #ball_half_height
 	sta x2
 
 	lda #$00
@@ -76,14 +98,17 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 
 	lda r1
 
-	cmp #$FF
+	and r2 // if both results were $FF, then a will contain $FF
+
+
 
 	sta r1
 
-	//TODO: Fix collisions
 	
 	rts
 
+
+	
 detect_dimension_collision:	//finds whether it is possible for the objects to collide in the given dimension, must be given paramenters, returns $FF in A register if true
 	lda #$00
 	sta r1 //load preliminary result
@@ -152,9 +177,3 @@ swap_d:
 	clc
 	
 	rts
-	
-
-
-
-
-
