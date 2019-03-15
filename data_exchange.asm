@@ -11,5 +11,5 @@ collision_data: .fill 1,0
 	byte 5: left border collision
 	*/
 	.var collisions = collision_data
-.print(collisions)
+
 
