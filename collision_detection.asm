@@ -36,9 +36,8 @@ coll_func_vars: .fill 9, 0
 	
 detect_collisions:
 	
-	lda #$00
-	sta x91
-	sta x92
+	
+	jsr clear_vars
 	jsr detect_ball_lpad
 	lda r1
 	and #%00000010
@@ -47,8 +46,8 @@ detect_collisions:
 	ora r2
 	sta collisions //sets bit in collision if necessary
 	
-	lda #$00
-	sta x91
+	
+	jsr clear_vars
 	sta x92
 	jsr detect_ball_rpad
 	lda r1
@@ -58,6 +57,8 @@ detect_collisions:
 	ora r2
 	sta collisions //sets bit in collision if necessary
 
+	
+	
 	rts
 
 detect_ball_lpad:
@@ -283,4 +284,16 @@ swap_d:
 	
 	clc
 	
+	rts
+
+clear_vars:
+	lda #$00
+	sta x1
+	sta x2
+	sta x91
+	sta x92
+	sta d1
+	sta d2
+	sta r1
+	sta r2
 	rts
