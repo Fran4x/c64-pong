@@ -6,9 +6,12 @@
 BasicUpstart2(start)
 
 	*=$080f "Main Code"
-	#import "music_player.asm"
+
 	#import "input_handling.asm"
-	#import "sprite_config.asm"
+	#import "collision_detection.asm"
+
+
+
 start:	jsr $e544 //clears screen, built in sub-routine at this location
 
 	// Sset colors of screen
@@ -24,7 +27,9 @@ start:	jsr $e544 //clears screen, built in sub-routine at this location
 	jsr set_irq
 
 	
-loop:	jmp loop
+loop:
+	jsr detect_collisions
+	jmp loop
 
 
 
@@ -58,4 +63,6 @@ irq:	dec $d019 // acknowledge IRQ
 
 
 	
-
+	//must be imported last, as they create a memory block
+	#import "music_player.asm"	
+	#import "sprite_config.asm"
