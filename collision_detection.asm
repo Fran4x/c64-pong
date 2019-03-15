@@ -78,19 +78,42 @@ detect_collisions:
 	jsr clear_vars
 	jsr detect_ball_left_border
 	lda r1
+	and #%00100000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+
+	jsr clear_vars
+	jsr detect_ball_right_border
+	lda r1
 	and #%00010000
 	sta r2
 	lda collisions
 	ora r2
 	sta collisions
-	
+
 	
 	rts
 
 
-
+detect_ball_right_border: //detects if ball has collided with the right border
+	lda #%00000100
+	and spr9th
+	bne d_b_r_b_1 //if 9th bit is 1, branch
+	rts
+d_b_r_b_1:
+	lda spr2_x
+	cmp #$4e
+	bcs d_b_r_b_2 //if $4e <= position, branch
+	rts
+d_b_r_b_2:
+	lda #$FF
+	sta r1
+	rts
+	
+	rts
 detect_ball_left_border: //detects if the ball has collided with the left border of the screen
-	jsr load_ball_x
 	
 	lda #%00000100
 	and spr9th
