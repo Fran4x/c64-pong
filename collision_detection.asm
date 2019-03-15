@@ -3,6 +3,7 @@ does NOT work in the following circumstances:
 Sprites very big (Should not happen)
 Sprites very close to x=255
 */
+#import "data_exchange.asm"
 
 	.var spr9th = $d010
 	.var spr0_x = $d000
@@ -34,16 +35,28 @@ coll_func_vars: .fill 9, 0
 	.var tmp = coll_func_vars + 8 //working variable
 	
 detect_collisions:
-
+	
 	lda #$00
 	sta x91
 	sta x92
 	jsr detect_ball_lpad
+	lda r1
+	and #%00000010
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions //sets bit in collision if necessary
+	
 	lda #$00
 	sta x91
 	sta x92
 	jsr detect_ball_rpad
-
+	lda r1
+	and #%00000001
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions //sets bit in collision if necessary
 
 	rts
 
@@ -101,7 +114,7 @@ detect_ball_lpad:
 	lda r1
 
 	and r2 // if both results were $FF, then a will contain $FF
-
+	
 
 	sta r1
 
