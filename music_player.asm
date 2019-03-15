@@ -1,7 +1,4 @@
 .var music = LoadSid("Kalinka.sid") //Load music file from system and save as variable for assembler.
-
-	*=$3000 "Music_def"
-
 	
 init_music:
 

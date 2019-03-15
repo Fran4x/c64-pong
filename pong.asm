@@ -1,12 +1,17 @@
-	#import "music_player.asm"
 
-		*=$2000 "Paddle"
-	.import binary "paddle.spr", 3 //import paddle sprite, skip first 3 bytes
+
+
 
 	
 BasicUpstart2(start)
 
 	*=$080f "Main Code"
+
+	#import "input_handling.asm"
+	#import "collision_detection.asm"
+
+
+
 start:	jsr $e544 //clears screen, built in sub-routine at this location
 
 	// Sset colors of screen
@@ -22,30 +27,11 @@ start:	jsr $e544 //clears screen, built in sub-routine at this location
 	jsr set_irq
 
 	
-loop:	jmp loop
+loop:
+	jsr detect_collisions
+	jmp loop
 
 
-set_sprt:
-	lda #$80
-	sta $07f8 //sprite is $80 * $64 bytes away from address 0
-	
-	lda #$01
-	sta $d01c //Enable multi-color mode on sprite 1
-	sta $d017 //Enable y-expansion of sprite 1
-	sta $d015 //enable first sprite
-
-	lda #$30
-	sta $043a // Load 0 into screen ram
-	lda #$31
-	sta $043c // Load 1 into screen ram
-
-	lda #$30
-	sta $d000 // x-coord
-	lda #$01 
-	sta $d010 // 9th bit x-coord
-	lda #$80
-	sta $d001 // y-coord
-	rts
 
 set_irq:
 	sei // turn off irq
@@ -76,38 +62,7 @@ irq:	dec $d019 // acknowledge IRQ
 	jmp $ea81 // return to kernel IRQ routine
 
 
-handle_input:
-	.var pra = $dc00 //CIA#1 Port Register A
-	.var prb = $dc01 //CIA#1 Port Register B
-	.var ddra = $dc02 // CIA#1 (Data Direction Register A)
-	.var ddrb = $dc03 // CIA#1 (Data Direction Register B)
-
-	lda #$FF
-	sta ddra // set data register a to output
-
-	lda #$00
-	sta ddrb // set data register b to input
-
-	lda #%11111101
-	sta pra // select third keyboard row
-	lda prb // load column info
-	and #%00000010 // check if 'w' was pressed
-	beq move_up
-
-	lda #%11111101
-	sta pra // select third keyboard row
-	lda prb // load column info
-	and #%00100000
-	beq move_down
 	
-	rts
-
-move_up:
-	dec $d001
-	rts
-
-move_down:
-	inc $d001
-	rts
-	
-
+	//must be imported last, as they create a memory block
+	#import "music_player.asm"	
+	#import "sprite_config.asm"
