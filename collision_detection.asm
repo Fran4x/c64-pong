@@ -1,3 +1,10 @@
+/* This file handles collision detection. It
+does NOT work in the following circumstances:
+Sprites very big (Should not happen)
+Sprites very close to x=255
+*/
+#import "data_exchange.asm"
+
 	.var spr9th = $d010
 	.var spr0_x = $d000 //spr0 is right paddle
 	.var spr0_y = $d001
@@ -6,7 +13,7 @@
 	.var spr2_x = $d004 //spr2 is left paddle
 	.var spr2_y = $d005
 	
-
+	
 	.var paddle_height = 21*2 //paddle height is multiplied by 2
 	.var paddle_half_height = 21
 	.var paddle_width = 6
@@ -28,10 +35,186 @@ coll_func_vars: .fill 9, 0
 	.var tmp = coll_func_vars + 8 //working variable
 	
 detect_collisions:
+	
+	
+	jsr clear_vars
+	jsr detect_ball_lpad
+	lda r1
+	and #%00000010
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions //sets bit in collision if necessary
+	
+	
+	jsr clear_vars
+	sta x92
 	jsr detect_ball_rpad
+	lda r1
+	and #%00000001
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions //sets bit in collision if necessary
+
+	jsr clear_vars
+	jsr detect_ball_upper_border
+	lda r1
+	and #%00000100
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+	
+	jsr clear_vars
+	jsr detect_ball_lower_border
+	lda r1
+	and #%00001000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+
+	jsr clear_vars
+	jsr detect_ball_left_border
+	lda r1
+	and #%00100000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+
+	jsr clear_vars
+	jsr detect_ball_right_border
+	lda r1
+	and #%00010000
+	sta r2
+	lda collisions
+	ora r2
+	sta collisions
+
 	
 	rts
 
+
+detect_ball_right_border: //detects if ball has collided with the right border
+	lda #%00000100
+	and spr9th
+	bne d_b_r_b_1 //if 9th bit is 1, branch
+	rts
+d_b_r_b_1:
+	lda spr2_x
+	cmp #$4e
+	bcs d_b_r_b_2 //if $4e <= position, branch
+	rts
+d_b_r_b_2:
+	lda #$FF
+	sta r1
+	rts
+	
+	rts
+detect_ball_left_border: //detects if the ball has collided with the left border of the screen
+	
+	lda #%00000100
+	and spr9th
+	beq d_b_le_b_1 //if 9th bit of ball is 0, branch
+	rts
+d_b_le_b_1:
+	lda #$18
+	cmp spr2_x
+	bcs d_b_le_b_2 // if position <= $18, branch
+	rts
+d_b_le_b_2:
+	lda #$FF
+	sta r1
+	rts
+
+
+detect_ball_upper_border: //detects if the ball has collided with the upper border
+	lda #00
+	sta r1
+	lda #$33
+	cmp spr2_y
+	bcs d_b_u_b_1 // if position <= $33, branch
+	rts
+d_b_u_b_1:
+	lda #$FF
+	sta r1
+	rts
+
+detect_ball_lower_border:	//detects if ball has collided with lower border
+	lda #00
+	sta r1
+	lda spr2_y
+	cmp #$f3
+	bcs d_b_l_b_1 // if $f3 <= position, branch
+	rts
+d_b_l_b_1:
+	lda #$FF
+	sta r1
+	rts
+
+detect_ball_lpad:
+	
+	lda spr1_x
+	clc
+	adc #paddle_half_width // add half the width, to find center of object
+	sta x1
+	lda x91
+	adc #$00 //add the carry of the last operation to 9th bit in case it overflowed
+	sta x91
+	
+
+	lda spr9th
+	clc
+	ror
+	and #$01 //Isolate 9th bit
+	clc //need to clear, as ror might have set carry
+  	adc x91 
+	sta x91
+
+
+
+	lda #paddle_width
+	sta d1
+
+	jsr load_ball_x
+
+	
+	jsr detect_dimension_collision //Detect if x-coordinate collides
+
+	lda r1
+	sta r2
+	
+	
+
+	lda spr1_y
+	clc
+	adc #paddle_half_height
+	sta x1
+	
+
+	lda #$00
+	sta x91
+
+	lda #paddle_height
+	sta d1
+
+	jsr load_ball_y
+
+	
+	jsr detect_dimension_collision
+
+	lda r1
+
+	and r2 // if both results were $FF, then a will contain $FF
+	
+
+	sta r1
+
+		
+	rts
+	
 detect_ball_rpad:	//checks whether a collision exists between the ball and right paddle, sets r1 to $FF if true
 	lda spr0_x
 	clc
@@ -41,34 +224,19 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 	adc #$00 //add the carry of the last operation to 9th bit in case it overflowed
 	sta x91
 	
-	lda spr2_x
-	clc
-	adc #ball_half_width
-	sta x2
-	lda x92
-	adc #$00
-	sta x92
-
 
 	lda spr9th
 	and #$01 //Isolate 9th bit
   	adc x91
 	sta x91
 
-	lda spr9th
-	clc
-	ror
-	clc
-	ror
-	and #$01 //Isolate 9th bit of ball only
-  	adc x92
-	sta x92
+
 
 	lda #paddle_width
 	sta d1
-	lda #ball_width
-	sta d2
-	
+
+	jsr load_ball_x
+
 	jsr detect_dimension_collision //Detect if x-coordinate collides
 
 	lda r1
@@ -81,18 +249,15 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 	adc #paddle_half_height
 	sta x1
 	
-	lda spr2_y
-	adc #ball_half_height
-	sta x2
 
 	lda #$00
 	sta x91
-	sta x92
 
 	lda #paddle_height
 	sta d1
-	lda #ball_height
-	sta d2
+
+	jsr load_ball_y
+
 
 	jsr detect_dimension_collision
 
@@ -101,15 +266,58 @@ detect_ball_rpad:	//checks whether a collision exists between the ball and right
 	and r2 // if both results were $FF, then a will contain $FF
 
 
-
 	sta r1
 
 	
 	rts
 
 
+load_ball_x:
 	
-detect_dimension_collision:	//finds whether it is possible for the objects to collide in the given dimension, must be given paramenters, returns $FF in A register if true
+	lda spr2_x
+	clc
+	adc #ball_half_width
+	sta x2
+	lda x92
+	adc #$00
+	sta x92
+
+	lda spr9th
+	clc
+	ror
+	clc
+	ror
+	and #$01 //Isolate 9th bit of ball only
+  	adc x92
+	sta x92
+
+	lda #ball_width
+	sta d2
+	
+	rts
+
+load_ball_y:
+	lda spr2_y
+	adc #ball_half_height
+	sta x2
+
+	lda #$00
+	sta x92
+
+	lda #ball_height
+	sta d2
+
+	rts
+	
+
+detect_dimension_collision: // finds if 9th bit is the same, if so continue
+//TODO: Make collision work even if 9th bit is different on each sprite
+	lda x91
+	cmp x92
+	beq detect_dimension_collision_2
+	rts
+	
+detect_dimension_collision_2:	//finds whether it is possible for the objects to collide in the given dimension, must be given paramenters, returns $FF in A register if true
 	lda #$00
 	sta r1 //load preliminary result
 	
@@ -130,7 +338,7 @@ d_d_1:	tay
 	adc d2 //add both dimension sizes
 	
 	sty tmp //store distance*2 in tmp
-
+ 
 	cmp tmp
 	bcs d_d_2 //distance*2 < width1+width2, return true
 	rts
@@ -140,19 +348,12 @@ d_d_2:	lda #$FF
 	rts
 
 ensure_dimension:	//Makes sure the first dimension is greater than the second
-	
-	
-	clc
-	lda x92
-	cmp x91 //Check if x92>=x91
-	beq en_d_2 //9th bit equal, check rest of bits
-	bcs swap_d //x92>x91, swap numbers
-	rts //x91 greater, end
-en_d_2:	
-	clc
-	lda x2
-	cmp x1 //check if x2>=x1
-	bcs swap_d //x2>x1, swap numbers
+	lda x1
+	sec
+	sbc x2
+	lda x91
+	sbc x92
+	bcc swap_d //x1<x2, swap numbers
 	rts
 
 swap_d:
@@ -176,4 +377,16 @@ swap_d:
 	
 	clc
 	
+	rts
+
+clear_vars:
+	lda #$00
+	sta x1
+	sta x2
+	sta x91
+	sta x92
+	sta d1
+	sta d2
+	sta r1
+	sta r2
 	rts
