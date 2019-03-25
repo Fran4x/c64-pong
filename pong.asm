@@ -9,27 +9,46 @@ BasicUpstart2(start)
 
 	#import "input_handling.asm"
 	#import "collision_detection.asm"
+	#import "ball_direction_2.asm"
+	#import "ball_move.asm"
+	#import "delay.asm"
 
-
+	
 
 start:	jsr $e544 //clears screen, built in sub-routine at this location
 
 	// Sset colors of screen
 	lda #BLACK
 	sta $d021
-
+	
 	lda #BLUE
 	sta $d020
 	//
-
+	
+	lda collision_data
+	
 	jsr init_music
 	jsr set_sprt
 	jsr set_irq
+loop:
+
+
+
+	jsr delay
+	jsr detect_collisions
+	jsr set_directions
+	jsr move_ball
+
 
 	
-loop:
-	jsr detect_collisions
 	jmp loop
+
+
+
+
+
+
+	
 
 
 

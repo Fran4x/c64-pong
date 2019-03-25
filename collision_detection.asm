@@ -5,12 +5,12 @@ Sprites very close to x=255
 */
 #import "data_exchange.asm"
 
-	.var spr9th = $d010
+	.var spr9th = $d010 //00000000
 	.var spr0_x = $d000 //spr0 is right paddle
 	.var spr0_y = $d001
-	.var spr1_x = $d002 //spr1 is ball
+	.var spr1_x = $d002 //spr1 is left
 	.var spr1_y = $d003
-	.var spr2_x = $d004 //spr2 is left paddle
+	.var spr2_x = $d004 //spr2 is ball
 	.var spr2_y = $d005
 	
 	

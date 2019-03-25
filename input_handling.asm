@@ -11,22 +11,37 @@ handle_input:
 	lda #$00
 	sta ddrb // set data register b to input
 
-	jsr check_down
 	jsr check_up
+	jsr check_down
 	rts
 
-check_down:	
-        lda #%11011101
+check_s_o:
+
+	lda #%11101101
+	sta pra // select second and fifth keyboard rows
+
+	lda prb //check 's' and 'o'
+	and #%01100000
+	beq move_s_o
+	
+check_w_l:
+
+	lda #%11011101
 	sta pra // select third keyboard row
 
 	lda prb // load column info
 	and #%00000110 //check if 'w' and 'l' is pressed
 	beq move_w_l
 
+check_down:	
+        lda #%11011101
+	sta pra // select third keyboard row
+
+
+
 	lda prb // load column info
 	and #%00100100 //check if 's' and 'l' is pressed
 	beq move_down_2
-
 
 	lda prb // load column info
 	and #%00000100 //check if 's' is pressed
@@ -43,9 +58,7 @@ check_up:
 	lda #%11101101
 	sta pra // select second and fifth keyboard rows
 
-	lda prb //check 's' and 'o'
-	and #%01100000
-	beq move_s_o
+
 
 	lda prb // load column info
 	and #%01000010 // check if 'w' and 'o'  was pressed
@@ -83,8 +96,8 @@ move_up:
 	rts
 
 move_s_o:
-	jsr move_up
-	jsr move_down_l
+	jsr move_up_dec
+	jsr move_down_dec_l
 	rts
 
 move_up_2:
@@ -101,10 +114,12 @@ move_up_l:
 	
 move_up_dec:
 	dec $d001 //decrease sprite 1 y-coord
+	dec $d001
 	rts
 
 move_up_dec_l:
 	dec $d003 //decrease sprite 1 y-coord
+	dec $d003
 	rts
 
 move_down:
@@ -121,18 +136,15 @@ move_down_l:
 
 move_down_dec:
 	inc $d001 //decrease sprite 1 y-coord
+	inc $d001
 	rts
 
 move_down_dec_l:
 	inc $d003 //decrease sprite 1 y-coord
+	inc $d003
 	rts
 
 move_down_2:
 	jsr move_down
 	jsr move_down_l
-	rts
-
-move_l_up_r_down:
-	jsr move_up
-	jsr move_up
 	rts
