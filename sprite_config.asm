@@ -16,7 +16,7 @@ set_sprt:
 
 	lda #$30
 	sta $043a // Load 0 into screen ram
-	lda #$31
+	lda #$30
 	sta $043c // Load 1 into screen ram
 
 	lda #$30
