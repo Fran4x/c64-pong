@@ -13,7 +13,7 @@ BasicUpstart2(start)
 
 start:	jsr $e544 //clears screen, built in sub-routine at this location
 
-	// Sset colors of screen
+	// set colors of screen
 	lda #BLACK
 	sta $d021
 	
@@ -73,12 +73,15 @@ set_irq:
 
 	lda #$01
 	sta $d01a // request rasterbeam irq
-
+	
 	lda #<irq
 	ldx #>irq
 	sta $314
 	stx $315 //store pointer to custom irq routine
 
+	lda #$85
+	sta $d012 // set first 7 bits of raster line to generate irq at
+	
 	lda $d011
 	and #$7f
 	sta $d011 // turn off 9th bit of raster line to generate irq at
