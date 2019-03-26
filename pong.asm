@@ -30,6 +30,7 @@ start:	jsr $e544 //clears screen, built in sub-routine at this location
 	jsr init_music
 	jsr set_sprt
 	jsr set_irq
+
 loop:
 
 

@@ -115,10 +115,12 @@ move_up_l:
 move_up_dec:
 	dec $d001 //decrease sprite 1 y-coord
 	dec $d001
+	dec $d001
 	rts
 
 move_up_dec_l:
 	dec $d003 //decrease sprite 1 y-coord
+	dec $d003
 	dec $d003
 	rts
 
@@ -137,14 +139,17 @@ move_down_l:
 move_down_dec:
 	inc $d001 //decrease sprite 1 y-coord
 	inc $d001
+	inc $d001
+	rts
+move_down_2:
+	jsr move_down
+	jsr move_down_l
 	rts
 
 move_down_dec_l:
 	inc $d003 //decrease sprite 1 y-coord
 	inc $d003
+	inc $d003
 	rts
 
-move_down_2:
-	jsr move_down
-	jsr move_down_l
-	rts
+

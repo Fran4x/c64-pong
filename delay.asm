@@ -1,6 +1,6 @@
 delay:
 		//cycles formula = 5ab+5a
-	ldy#10 //a=10
+	ldy#3 //a=10 (original value)
 	ldx#119 //b=119
 repeat:
 	
