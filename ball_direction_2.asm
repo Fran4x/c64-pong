@@ -5,11 +5,7 @@ var_up:	.fill 1,0
 
 var_right: .fill 1,0
 	.var dir_right = var_right
-
-var_ball_spawn_dir: .fill 1,0
-	.var dir_ball_spawn = var_ball_spawn_dir
 	
-
 set_directions:
 	jsr check_right
 	jsr check_left
@@ -132,6 +128,7 @@ reset_ball: //reset ball position
 	and spr9th
 	sta spr9th //save to spr9th
 
+	
 	lda dir_right //invert direction on point scored
 	and #%00000001
 	eor #%00000001

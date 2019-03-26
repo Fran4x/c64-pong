@@ -20,7 +20,7 @@ play:
 	//
 	
 	jsr music.play //jump to play subroutine
-	lda #PURPLE
+	lda #BLUE
 	sta $d020
 
 	rts
