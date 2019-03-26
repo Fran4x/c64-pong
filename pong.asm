@@ -1,8 +1,3 @@
-
-
-
-
-	
 BasicUpstart2(start)
 
 	*=$080f "Main Code"
@@ -12,6 +7,7 @@ BasicUpstart2(start)
 	#import "ball_direction_2.asm"
 	#import "ball_move.asm"
 	#import "delay.asm"
+	#import "start_wait.asm"
 
 	
 
@@ -26,10 +22,23 @@ start:	jsr $e544 //clears screen, built in sub-routine at this location
 	//
 	
 	lda collision_data
+
+	jsr set_sprt
+
+	jsr wait_for_key
+
+pre_loop:
+	lda start_game
+	bne start_music
+	
+	jmp pre_loop
+
+start_music:	
 	
 	jsr init_music
-	jsr set_sprt
+
 	jsr set_irq
+
 
 loop:
 
