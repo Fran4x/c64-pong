@@ -1,5 +1,9 @@
 var_start:	.fill 1,0
 	.var start_game = var_start
+start_text:
+	.text "press h to start"
+ins_text:
+	.text "  keys: w a o l   "
 	
 
 
@@ -14,6 +18,22 @@ wait_for_key:
 
         lda #%11110111
         sta $dc00
+
+
+
+	ldy #16		//length of text
+load_start_msg:
+	dey
+	php			//push status registers onto the stack
+
+	lda start_text,y 	//this loop transfers the contents of 
+	sta $07A4,y		//the start_text text into the screen ram
+	
+	plp			//pull status registers, in order to get whether dey
+				//was equal to zero
+	bne load_start_msg
+
+	
             
 repeat_2:
 	lda $dc01
@@ -22,6 +42,22 @@ repeat_2:
 	
 	lda #1
 	sta var_start
+
+	ldy #16		//length of text
+	jsr load_ins_msg
 	
         cli	// set interrupts
 	rts	// return
+
+
+	
+load_ins_msg: //see load_start_msg above
+	dey
+	php
+	
+	lda ins_text,y
+	sta $07A4,y
+	
+	plp
+	bne load_ins_msg
+	rts
