@@ -1,4 +1,4 @@
-.var music = LoadSid("Kalinka.sid") //Load music file from system and save as variable for assembler.
+.var music = LoadSid("10th_Dan.sid") //Load music file from system and save as variable for assembler.
 	
 init_music:
 

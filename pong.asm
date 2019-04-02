@@ -49,6 +49,7 @@ loop:
 	jsr set_directions
 	jsr move_ball
 
+	rts
 
 	
 	jmp loop
