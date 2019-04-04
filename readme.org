@@ -1,1 +1,9 @@
-Pong for the C64
+* C64 Pong
+[[https://media.giphy.com/media/9xyMiv2aacIqzRRvWC/giphy.gif]]
+** How to compile
+1. Get KickAssembler
+2. Compile pong.asm, for example with the command "KickAss.jar pong.asm"
+
+** How to run
+1. Get a C64 emulator, for example VICE
+2. Use an appropriate command to run the compiled program file, for example "x64 pong.prg"
