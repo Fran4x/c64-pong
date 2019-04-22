@@ -3,76 +3,71 @@ move_ball:
 
 
 
-	jsr sub_1
-	jsr sub_2
+	jsr vertical_movement
+	jsr horizontal_movement
 
 	
 
 	rts
 
-sub_2:
-	lda dir_right
-	bne move_ball_right_dd
-	beq move_ball_left_dd
+horizontal_movement:
+	lda dir_right //check if going right
+	bne move_ball_right //if not false (zero), move right
+	beq move_ball_left //if false, move left
 	rts
 
-sub_1:
-	lda dir_up
-	beq move_ball_down_dd
-	bne move_ball_up_dd
+vertical_movement:
+	lda dir_up //check if going up
+	beq move_ball_down //if not false, move down
+	bne move_ball_up //if false, move up
 	rts
 	
-move_ball_right_dd:
+move_ball_right: //move right, taking into account 9th position bit stored in spr9th
 	lda spr2_x
 	clc
 	adc #1
 	sta spr2_x
 
 	lda #0
-	adc #0
+	adc #0 //if carry flag on previous operation set, result is 1
 
-	asl
+	asl //arithmetic shift left
 	asl
 
-	ora spr9th
+	ora spr9th //if 1, change spr9th value
 	sta spr9th
 	
 	rts
 
-move_ball_left_dd:
+move_ball_left:
 
-	//spr9th: 00000001/0
-	//spr2_x: 00000001
-	
-
-//
 	dec spr2_x
-	lda spr9th //00000x00
+	lda spr9th
 
 
 	lsr
 	lsr
 
-	and #%00000001  //00000001/0
+	and #%00000001
 		
 
 	adc spr2_x
 
-	beq set_255
+	beq set_spr2x_to_255
 
 	
 	
 	rts
 	
-move_ball_up_dd:
+move_ball_up:
 	dec spr2_y //decrease since y-coords are inverted
 	rts
 	
-move_ball_down_dd:
-	inc spr2_y
+move_ball_down:
+	inc spr2_y //increase y-value because of inverted screen coords
 	rts
 
-set_255:
+set_spr2x_to_255:	
 	lda #255
 	sta spr2_x
 
